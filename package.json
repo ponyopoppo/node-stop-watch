@@ -1,0 +1,15 @@
+{
+  "name": "node-stop-watch",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Komine Shunta <kmnshnt@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "mocha": "^6.2.0",
+    "ts-mocha": "^6.0.0",
+    "typescript": "^3.5.3"
+  },
+  "scripts": {
+    "test": "ts-mocha test/index.ts"
+  }
+}
