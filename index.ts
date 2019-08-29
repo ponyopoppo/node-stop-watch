@@ -33,12 +33,13 @@ export default class StopWatch {
         this.beginTime = new Date();
     }
 
-    record() {
+    record(comment?: string) {
         if (StopWatch.disabled) return;
         const { key } = this;
         const now = new Date().getTime();
+        const time = now - this.beginTime.getTime();
         StopWatch.loggingFunc(
-            `[${key}] rec: ${now - this.beginTime.getTime()}`
+            `[${key}] ${comment ? `${comment} ` : ''}rec: ${time}`
         );
     }
 

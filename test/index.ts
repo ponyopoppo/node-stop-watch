@@ -11,7 +11,7 @@ describe('measure', () => {
         for (let index = 0; index < 30; index++) {
             const sw = new StopWatch(`key${Math.floor(Math.random() * 10)}`);
             await sleep(Math.floor(Math.random() * 10));
-            sw.record();
+            sw.record('comment');
             await sleep(Math.floor(Math.random() * 10));
             sw.end();
         }
