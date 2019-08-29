@@ -1,7 +1,7 @@
 {
   "name": "@ponyopoppo/node-stop-watch",
-  "version": "1.0.0",
-  "main": "dist/index.js",  
+  "version": "1.0.1",
+  "main": "dist/index.js",
   "private": false,
   "license": "MIT",
   "dependencies": {
