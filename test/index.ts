@@ -8,20 +8,14 @@ describe('measure', () => {
     it('should log', async () => {
         // StopWatch.disable();
         StopWatch.setLogging();
-        for (let index = 0; index < 10; index++) {
-            StopWatch.begin('key1');
-            await sleep(5);
-            StopWatch.record('key1');
-            await sleep(5);
-            StopWatch.end('key1');
+        for (let index = 0; index < 30; index++) {
+            const sw = new StopWatch(`key${Math.floor(Math.random() * 10)}`);
+            await sleep(Math.floor(Math.random() * 10));
+            sw.record();
+            await sleep(Math.floor(Math.random() * 10));
+            sw.end();
         }
-        for (let index = 0; index < 10; index++) {
-            StopWatch.begin('key2');
-            await sleep(3);
-            StopWatch.record('key2');
-            await sleep(3);
-            StopWatch.end('key2');
-        }
-        console.log(StopWatch.stats);
+        // console.log(StopWatch.stats);
+        // console.log(StopWatch.renderResult());
     });
 });

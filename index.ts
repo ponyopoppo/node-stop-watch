@@ -1,5 +1,3 @@
-import fs from 'fs';
-
 interface StatsData {
     min: number;
     max: number;
@@ -19,8 +17,7 @@ const defaultStatsData: StatsData = {
 export default class StopWatch {
     private static loggingFunc: (text: string) => void = console.log;
     private static disabled = false;
-    private static beginTime: { [key: string]: Date } = {};
-
+    private beginTime: Date;
     static stats: { [key: string]: StatsData } = {};
 
     static setLogging(func?: (text: string) => void) {
@@ -32,39 +29,63 @@ export default class StopWatch {
         this.disabled = true;
     }
 
-    static begin(key: string) {
-        if (this.disabled) return;
-        this.beginTime[key] = new Date();
+    constructor(private key: string) {
+        this.beginTime = new Date();
     }
 
-    static record(key: string) {
-        if (this.disabled) return;
-        if (!this.beginTime[key]) {
-            this.loggingFunc(`Error for ${key}: It's not started.`);
-            return;
-        }
+    record() {
+        if (StopWatch.disabled) return;
+        const { key } = this;
         const now = new Date().getTime();
-        this.loggingFunc(
-            `[${key}] rec: ${now - this.beginTime[key].getTime()}`
+        StopWatch.loggingFunc(
+            `[${key}] rec: ${now - this.beginTime.getTime()}`
         );
     }
 
-    static end(key: string) {
-        if (this.disabled) return;
-        if (!this.beginTime[key]) {
-            this.loggingFunc(`Error for ${key}: It's not started.`);
-            return;
-        }
+    end() {
+        if (StopWatch.disabled) return;
+        const { key } = this;
         const now = new Date().getTime();
-        const diff = now - this.beginTime[key].getTime();
-        delete this.beginTime[key];
-        const statsData = this.stats[key] || defaultStatsData;
+        const diff = now - this.beginTime.getTime();
+        const statsData = StopWatch.stats[key] || defaultStatsData;
         const min = Math.min(statsData.min, diff);
         const max = Math.max(statsData.max, diff);
         const sum = statsData.sum + diff;
         const cnt = statsData.cnt + 1;
         const avg = sum / cnt;
-        this.stats[key] = { min, max, sum, cnt, avg };
-        this.loggingFunc(`[${key}] end: ${diff}`);
+        StopWatch.stats[key] = { min, max, sum, cnt, avg };
+        StopWatch.loggingFunc(`[${key}] end: ${diff}`);
+    }
+
+    static renderResult(): string {
+        const rows = ['key', 'cnt', 'sum', 'avg', 'min', 'max'];
+        return `
+        <html><body><table id="table-id" border="1" style="width: 100%;">
+        <thead>
+            <tr>
+                ${rows.map(row => `<th>${row}</th>`).join('')}
+            </tr>
+        </thead>
+        <tbody>
+        ${Object.keys(StopWatch.stats)
+            .map(key => {
+                return `<tr>${rows
+                    .map(
+                        row =>
+                            `<td>${
+                                row === 'key' ? key : StopWatch.stats[key][row]
+                            }</td>`
+                    )
+                    .join('')}
+            </tr>`;
+            })
+            .join('')}
+        </tbody>
+        </table>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.1.0/tablesort.min.js'></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.1.0/sorts/tablesort.number.min.js'></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.1.0/sorts/tablesort.date.min.js'></script>
+        <script>new Tablesort(document.getElementById('table-id'));</script>                
+        </body></html>`;
     }
 }
