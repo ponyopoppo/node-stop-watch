@@ -6,12 +6,13 @@ async function sleep(ms: number) {
 
 describe('measure', () => {
     it('should log', async () => {
-        // StopWatch.disable();
-        StopWatch.setLogging();
+        // StopWatch.disableAll();
+        // StopWatch.setLogging();
         for (let index = 0; index < 30; index++) {
             const sw = new StopWatch(`key${Math.floor(Math.random() * 10)}`);
             await sleep(Math.floor(Math.random() * 10));
             sw.record('comment');
+            sw.disable();
             await sleep(Math.floor(Math.random() * 10));
             sw.end();
         }

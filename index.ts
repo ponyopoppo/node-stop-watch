@@ -17,6 +17,7 @@ const defaultStatsData: StatsData = {
 export default class StopWatch {
     private static loggingFunc: (text: string) => void = console.log;
     private static disabled = false;
+    private _disabled = false;
     private beginTime: Date;
     static stats: { [key: string]: StatsData } = {};
 
@@ -25,8 +26,12 @@ export default class StopWatch {
         else this.loggingFunc = () => {};
     }
 
-    static disable() {
-        this.disabled = true;
+    static disableAll(value: boolean = true) {
+        this.disabled = value;
+    }
+
+    disable(value: boolean = true) {
+        this._disabled = value;
     }
 
     constructor(private key: string) {
@@ -34,17 +39,17 @@ export default class StopWatch {
     }
 
     record(comment?: string) {
-        if (StopWatch.disabled) return;
+        if (StopWatch.disabled || this._disabled) return;
         const { key } = this;
         const now = new Date().getTime();
         const time = now - this.beginTime.getTime();
         StopWatch.loggingFunc(
-            `[${key}] ${comment ? `${comment} ` : ''}rec: ${time}`
+            `[${key}] ${comment ? `${comment}` : 'rec'}:\t${time}`
         );
     }
 
     end() {
-        if (StopWatch.disabled) return;
+        if (StopWatch.disabled || this._disabled) return;
         const { key } = this;
         const now = new Date().getTime();
         const diff = now - this.beginTime.getTime();
@@ -55,7 +60,7 @@ export default class StopWatch {
         const cnt = statsData.cnt + 1;
         const avg = sum / cnt;
         StopWatch.stats[key] = { min, max, sum, cnt, avg };
-        StopWatch.loggingFunc(`[${key}] end: ${diff}`);
+        StopWatch.loggingFunc(`[${key}] end:\t${diff}`);
     }
 
     static renderResult(): string {
