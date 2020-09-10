@@ -1,11 +1,12 @@
 {
   "name": "@ponyopoppo/node-stop-watch",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "dist/index.js",
   "private": false,
   "license": "MIT",
   "dependencies": {
     "@types/mocha": "^5.2.7",
+    "@types/node": "^14.6.4",
     "mocha": "^6.2.0",
     "ts-mocha": "^6.0.0",
     "typescript": "^3.5.3"

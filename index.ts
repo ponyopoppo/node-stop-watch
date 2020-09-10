@@ -19,6 +19,7 @@ export default class StopWatch {
     private static disabled = false;
     private _disabled = false;
     private beginTime: Date;
+    private lastTime: Date;
     static stats: { [key: string]: StatsData } = {};
 
     static setLogging(func?: (text: string) => void) {
@@ -36,23 +37,28 @@ export default class StopWatch {
 
     constructor(private key: string) {
         this.beginTime = new Date();
+        this.lastTime = new Date();
     }
 
-    record(comment?: string) {
+    record(comment: string) {
         if (StopWatch.disabled || this._disabled) return;
         const { key } = this;
-        const now = new Date().getTime();
-        const time = now - this.beginTime.getTime();
-        StopWatch.loggingFunc(
-            `[${key}] ${comment ? `${comment}` : 'rec'}:\t${time}`
-        );
+        this.updateStats(key, comment);
     }
 
     end() {
         if (StopWatch.disabled || this._disabled) return;
         const { key } = this;
+        this.updateStats(key, 'end');
+        this.updateStats(key);
+    }
+
+    private updateStats(_key: string, comment?: string) {
+        const key = comment ? `${_key}#${comment}` : _key;
         const now = new Date().getTime();
-        const diff = now - this.beginTime.getTime();
+        const diff = comment
+            ? now - this.lastTime.getTime()
+            : now - this.beginTime.getTime();
         const statsData = StopWatch.stats[key] || defaultStatsData;
         const min = Math.min(statsData.min, diff);
         const max = Math.max(statsData.max, diff);
@@ -60,7 +66,8 @@ export default class StopWatch {
         const cnt = statsData.cnt + 1;
         const avg = sum / cnt;
         StopWatch.stats[key] = { min, max, sum, cnt, avg };
-        StopWatch.loggingFunc(`[${key}] end:\t${diff}`);
+        StopWatch.loggingFunc(`[${key}]:\t${diff}`);
+        this.lastTime = new Date();
     }
 
     static renderResult(): string {
@@ -69,15 +76,15 @@ export default class StopWatch {
         <html><body><table id="table-id" border="1" style="width: 100%;">
         <thead>
             <tr>
-                ${rows.map(row => `<th>${row}</th>`).join('')}
+                ${rows.map((row) => `<th>${row}</th>`).join('')}
             </tr>
         </thead>
         <tbody>
         ${Object.keys(StopWatch.stats)
-            .map(key => {
+            .map((key) => {
                 return `<tr>${rows
                     .map(
-                        row =>
+                        (row) =>
                             `<td>${
                                 row === 'key' ? key : StopWatch.stats[key][row]
                             }</td>`
@@ -91,7 +98,7 @@ export default class StopWatch {
         <script src='https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.1.0/tablesort.min.js'></script>
         <script src='https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.1.0/sorts/tablesort.number.min.js'></script>
         <script src='https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.1.0/sorts/tablesort.date.min.js'></script>
-        <script>new Tablesort(document.getElementById('table-id'));</script>                
+        <script>new Tablesort(document.getElementById('table-id'));</script>
         </body></html>`;
     }
 }

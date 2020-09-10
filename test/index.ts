@@ -1,7 +1,9 @@
 import StopWatch from '../';
+import * as fs from 'fs';
+import * as path from 'path';
 
 async function sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 describe('measure', () => {
@@ -12,11 +14,15 @@ describe('measure', () => {
             const sw = new StopWatch(`key${Math.floor(Math.random() * 10)}`);
             await sleep(Math.floor(Math.random() * 10));
             sw.record('comment');
-            sw.disable();
+            await sleep(10);
+            sw.record('hoge');
+            // sw.disable();
             await sleep(Math.floor(Math.random() * 10));
             sw.end();
         }
-        // console.log(StopWatch.stats);
-        // console.log(StopWatch.renderResult());
+        fs.writeFileSync(
+            path.join(__dirname, '../tmp.html'),
+            StopWatch.renderResult()
+        );
     });
 });
